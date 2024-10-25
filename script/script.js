@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let questions = [];
     let numberQuestion = 0;
 
-    // Fetch questions from JSON file
     fetch("./questions.json")
         .then(response => response.json())
         .then(data => {
@@ -31,17 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const playTest = () => {
         const renderQuestion = () => {
-            // Hide Prev button if numberQuestion is 0, show otherwise
             btnPrev.style.display = numberQuestion > 0 ? "block" : "none";
 
-            // Hide Next button if numberQuestion is at the last question
             btnNext.style.display = numberQuestion === questions.length - 1 ? "none" : "block";
 
-            // Get the current question
             const currentQuestion = questions[numberQuestion];
             questionTitle.textContent = currentQuestion.question;
 
-            // Display answers with images
             formAnswers.innerHTML = currentQuestion.answers.map((answer, index) => `
                 <div class="answers-item d-flex flex-column">
                     <input type="${currentQuestion.type}" id="answerItem${index}" name="answer" class="d-none">
