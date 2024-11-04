@@ -7,19 +7,26 @@ li {
     list-style-type: none;
 }
 
+.answers-item {
+    width: 80px;  
+    height: 109px; 
+   
+}
+
 .answers-item label {
     cursor: pointer;
     border: 2px solid #000;
     border-radius: 0 0 10px 10px;
     min-width: 60px;
     text-align: center;
+    flex: 1;  
 }
 
 .answers-item label:hover {
-    border: 2px solid rgba(0,0,0,0.5);
+    border: 2px solid rgba(0, 0, 0, 0.5);
 }
 
-input:checked + label{
+input:checked + label {
     border: 2px solid #3CB371;
     color: #3CB371;
 }
@@ -32,10 +39,6 @@ label span {
     width: 100%;
 }
 
-.answers-item {
-    width: 80px;
-}
-
 .logo-img {
     width: 50px;
     height: 50px;
@@ -43,7 +46,10 @@ label span {
     background-size: contain;
 }
 
-.logo-text, .contacts, .main-title, .arrow {
+.logo-text,
+.contacts,
+.main-title,
+.arrow {
     color: #3CB371;
     -webkit-text-stroke-width: 2px;
     -webkit-text-stroke-color: black;
@@ -57,14 +63,11 @@ label span {
 }
 
 .modal {
-    background: rgba(0,0,0, 0.5);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
     background: #E0FFFF;
-    /* color: #3CB371; */
-    /* -webkit-text-stroke-width: 1px; */
-    /* -webkit-text-stroke-color: black;  */
 }
 
 .btn-outline-danger {
@@ -77,13 +80,13 @@ label span {
     font-size: 2rem !important;
     color: #3CB371;
     -webkit-text-stroke-width: 2px;
-    -webkit-text-stroke-color: black; 
+    -webkit-text-stroke-color: black;
 }
 
 .btn-outline-danger:hover,
 .btn-outline-danger:active,
 .btn-outline-danger:focus,
-.btn-outline-danger:visited{
+.btn-outline-danger:visited {
     background-color: #3CB371 !important;
     color: black !important;
 }
@@ -91,8 +94,8 @@ label span {
 .btn-outline-danger:hover span,
 .btn-outline-danger:active span,
 .btn-outline-danger:focus span,
-.btn-outline-danger:visited span{
+.btn-outline-danger:visited span {
     color: #E0FFFF !important;
     -webkit-text-stroke-width: 2px;
-    -webkit-text-stroke-color: black; 
+    -webkit-text-stroke-color: black;
 }

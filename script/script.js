@@ -1,3 +1,8 @@
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { app } from './app.js'; 
+
+const database = getDatabase(app);
+
 document.addEventListener("DOMContentLoaded", function () {
     const btnOpenModal = document.querySelector("#btnOpenModal");
     const modalBlock = document.querySelector("#modalBlock");
@@ -10,14 +15,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let questions = [];
     let numberQuestion = 0;
+    let answersData = []; 
 
     fetch("./questions.json")
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
             questions = data.questions;
             playTest();
         })
-        .catch(error => console.error("Error loading questions:", error));
+        .catch((error) => console.error("Error loading questions:", error));
 
     btnOpenModal.addEventListener("click", () => {
         modalBlock.classList.add("d-block");
@@ -30,22 +36,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const playTest = () => {
         const renderQuestion = () => {
-            btnPrev.style.display = numberQuestion > 0 ? "block" : "none";
+            if (numberQuestion < questions.length) {
+                const currentQuestion = questions[numberQuestion];
+                questionTitle.textContent = currentQuestion.question;
 
-            btnNext.style.display = numberQuestion === questions.length - 1 ? "none" : "block";
+                formAnswers.innerHTML = currentQuestion.answers
+                    .map(
+                        (answer, index) => `
+                        <div class="answers-item d-flex flex-column">
+                            <input type="${currentQuestion.type}" id="answerItem${index}" name="answer" class="d-none" value="${answer.title}">
+                            <label for="answerItem${index}" class="d-flex flex-column justify-content-between">
+                                <img class="answerImg" src="${answer.url}" alt="${answer.title}">
+                                <span>${answer.title}</span>
+                            </label>
+                        </div>
+                    `
+                    )
+                    .join("");
 
-            const currentQuestion = questions[numberQuestion];
-            questionTitle.textContent = currentQuestion.question;
-
-            formAnswers.innerHTML = currentQuestion.answers.map((answer, index) => `
-                <div class="answers-item d-flex flex-column">
-                    <input type="${currentQuestion.type}" id="answerItem${index}" name="answer" class="d-none">
-                    <label for="answerItem${index}" class="d-flex flex-column justify-content-between">
-                        <img class="answerImg" src="${answer.url}" alt="${answer.title}">
-                        <span>${answer.title}</span>
-                    </label>
-                </div>
-            `).join("");
+                btnPrev.style.display = numberQuestion === 0 ? "none" : "block";
+                btnNext.style.display = "block";
+                sendBtn.classList.add("d-none");
+                questionTitle.style.display = "block";
+            } else {
+                questionTitle.textContent = "Введіть ваше ім'я та номер телефону:";
+                formAnswers.innerHTML = `
+                    <div class="form-group w-100 mb-2">
+                        <input type="text" id="nameInput" class="form-control" placeholder="Ваше ім'я">
+                    </div>
+                    <div class="form-group w-100">
+                        <input type="tel" id="phoneInput" class="form-control" placeholder="+380XXXXXXXXX">
+                    </div>
+                `;
+                btnPrev.style.display = "none";
+                btnNext.style.display = "none";
+                sendBtn.classList.remove("d-none");
+                questionTitle.style.display = "block"; 
+            }
         };
 
         renderQuestion();
@@ -59,9 +86,49 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     btnNext.addEventListener("click", () => {
-        if (numberQuestion < questions.length - 1) {
+        const selectedAnswer = formAnswers.querySelector('input[name="answer"]:checked');
+        if (selectedAnswer) {
+            answersData.push({
+                question: questions[numberQuestion].question,
+                answer: selectedAnswer.value,
+            });
+        }
+
+        if (numberQuestion < questions.length) {
             numberQuestion++;
             playTest();
         }
+    });
+
+    sendBtn.addEventListener("click", () => {
+        const nameInput = document.querySelector("#nameInput").value;
+        const phoneInput = document.querySelector("#phoneInput").value;
+
+        answersData.push({ "ім'я": nameInput });
+        answersData.push({ "номер телефону": phoneInput });
+
+        set(ref(database, 'responses/' + Date.now()), {
+            answers: answersData
+        })
+        .then(() => {
+            console.log('Данные успешно отправлены на Firebase');
+            questionTitle.style.display = "none";
+            const thankYouMessage = document.createElement("div");
+            thankYouMessage.textContent = "Дякую за відповідь!";
+            thankYouMessage.classList.add("thank-you-message", "text-center", "mt-3");
+            formAnswers.innerHTML = ""; 
+            formAnswers.appendChild(thankYouMessage); 
+            sendBtn.classList.add("d-none"); 
+            
+            setTimeout(() => {
+                thankYouMessage.remove(); 
+                location.reload(); 
+            }, 4000);
+        })
+        .catch((error) => {
+            console.error('Ошибка отправки данных на Firebase:', error);
+        });
+
+        questionTitle.textContent = "";
     });
 });
